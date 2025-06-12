@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>구글 독과점 리스크 심층 분석 대시보드 (리스크 근거 명시)</title>
+    <title>구글 독과점 리스크 심층 분석 대시보드 (반복손익 기준)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -11,9 +11,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Modern Slate (Background: #F1F5F9, Text: #1E293B, Primary Accent: #3B82F6, Highlight: #F59E0B) -->
-    <!-- Application Structure Plan: A single-page dashboard with a logical flow. This final version adds a new, detailed "Basis for Regulatory Risk Estimation" section as requested, providing quantitative reasoning for the risk factors applied in the financial charts. This enhances transparency and credibility. -->
+    <!-- Application Structure Plan: A single-page dashboard with a logical flow. This final version adds a new, detailed "Basis for Regulatory Risk Estimation" section as requested, providing quantitative reasoning for the risk factors applied in the financial charts. It explicitly excludes one-time costs as requested. -->
     <!-- Visualization & Content Choices: 
-    - Risk Estimation Basis: A new text-based section with clear headings and lists breaks down the logic for Search, Network, and Subscriptions risk factors, using specific numbers and assumptions.
+    - Risk Estimation Basis: A new text-based section with clear headings and lists breaks down the logic for Search, Network, and Subscriptions risk factors, using specific numbers and assumptions, and explicitly stating one-time costs are excluded.
     - P/E Analysis: Maintains the 1/2/3-Year Forward P/E split.
     - Scenario Assumptions: The detailed 10-scenario grid remains.
     - Overall Assessment: The conclusion integrates all preceding quantitative analysis.
@@ -43,7 +43,7 @@
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0">
-                    <h1 class="text-xl font-bold text-slate-800">Google 독점 규제 심층 분석 v13</h1>
+                    <h1 class="text-xl font-bold text-slate-800">Google 독점 규제 심층 분석 v16</h1>
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-2">
@@ -98,36 +98,38 @@
                         </div>
                     </div>
                 </div>
-                 <p class="text-xs text-slate-500 mt-6 text-center">* 리스크 영향분은 제공된 분석 보고서를 기반으로 한 추정치입니다.</p>
+                 <p class="text-xs text-slate-500 mt-6 text-center">* 리스크 영향분은 아래 제시된 근거에 따라 산정된 추정치입니다.</p>
             </div>
             
             <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mt-8">
-                 <h3 class="text-2xl font-bold text-slate-900 mb-4">규제 리스크 영향분 추정 근거</h3>
+                 <h3 class="text-2xl font-bold text-slate-900 mb-4">규제 리스크 영향분 산정 근거 (반복 손익 기준)</h3>
+                 <p class="text-sm text-slate-500 mb-6">아래 분석은 차트에 표시된 '리스크 영향분'의 산출 근거를 설명합니다. 이 계산에서는 반복적으로 이익에 영향을 미칠 수 있는 요인에 집중했으며, **일회성 비용(예: 벌금, 소송 합의금)은 제외**했습니다.</p>
                  <div class="space-y-6 text-sm">
                     <div class="prose prose-slate max-w-none">
-                        <h4>구글 검색 (리스크 영향분: 약 30%)</h4>
-                        <p>검색 부문의 가장 큰 리스크는 미국 법무부가 문제 삼는 Apple과의 기본 검색엔진 계약(TAC) 파기 가능성입니다. 이에 대한 재무적 영향은 다음과 같이 추정합니다.</p>
+                        <h4>1. 핵심 규제 사안별 이익 영향 추정</h4>
                         <ul>
-                            <li><strong>비용 절감 (긍정적):</strong> Apple에 지불하던 연간 TAC 비용 <strong class="text-green-600">약 200억 달러</strong>가 절감됩니다.</li>
-                            <li><strong>매출 손실 (부정적):</strong> 공개된 자료에 따르면 iOS 기기에서 발생하는 검색 광고 매출은 연간 약 556억 달러로 추정됩니다. 기본 검색엔진 지위 상실 시, 이 중 50%인 <strong class="text-red-600">약 278억 달러</strong>의 매출 손실이 발생한다고 가정합니다. (검색 광고 영업이익률 약 45% 적용 시, 이익 손실은 약 125억 달러)</li>
-                            <li><strong>순 영향 (세전 이익 기준):</strong> 비용 절감(+200억)과 매출 손실로 인한 이익 감소(-125억)를 고려하면, 순수하게 이 계약 파기만으로 <strong class="text-green-600">약 75억 달러의 이익 개선</strong>이 나타날 수 있습니다. 하지만 이는 트래픽 감소로 인한 장기 성장성 둔화를 고려하지 않은 수치입니다. 본 분석의 리스크 영향분은 이러한 복합적인 영향을 고려하여 전체 검색 영업이익의 약 30%로 산정했습니다.</li>
+                            <li><strong>Apple TAC 계약 파기 시나리오 분석 (반복적 손익):</strong>
+                                <ul>
+                                    <li>(+) 이익 증가 요인: 연간 TAC 비용 <strong class="text-green-600">약 200억 달러</strong> 절감.</li>
+                                    <li>(-) 이익 감소 요인: iOS 트래픽 감소로 인한 검색 광고 이익 손실을 약 <strong class="text-red-600">125억 달러</strong>로 추정 (매출 손실 278억 달러 * 검색 이익률 45%).</li>
+                                    <li>단기적 순 영향: +200억 - 125억 = <strong class="text-green-600">약 +75억 달러</strong> 이익 증가. <br><em>(주: 이는 시장 점유율 하락과 장기 성장 둔화라는 질적 리스크를 고려하지 않은 단기적, 회계적 수치입니다.)</em></li>
+                                </ul>
+                            </li>
+                             <li><strong>광고 기술(Ad-Tech) 규제 시 이익 영향:</strong>
+                                 <ul>
+                                    <li>Google Ad Manager 등 사업부의 기능 제한 또는 분할 리스크를 고려하여, 네트워크 부문 영업이익(연간 약 64억 달러)의 30%인 약 <strong class="text-red-600">-19억 달러</strong>의 반복적 이익 감소를 가정합니다.</li>
+                                 </ul>
+                            </li>
+                             <li><strong>구독(Play Store) 규제 시 이익 영향:</strong>
+                                 <ul>
+                                    <li>대체 결제 시스템 도입에 따른 평균 수수료율 하락을 가정하여, 구독 부문 영업이익(연간 약 70억 달러)의 15%인 약 <strong class="text-red-600">-10억 달러</strong>의 반복적 이익 감소를 가정합니다.</li>
+                                 </ul>
+                            </li>
                         </ul>
                     </div>
                     <div class="prose prose-slate max-w-none">
-                        <h4>구글 네트워크 (리스크 영향분: 약 40%)</h4>
-                        <p>네트워크 부문 리스크는 광고 기술(Ad-Tech) 사업부, 특히 Google Ad Manager의 강제 매각 또는 기능 제한 가능성에 기인합니다. </p>
-                        <ul>
-                            <li><strong>직접적 타격:</strong> 네트워크 매출의 대부분은 광고주와 게시자를 연결하는 Ad-Tech 플랫폼에서 발생합니다. 만약 이 사업부가 분할되면, 관련 매출 및 이익의 상당 부분이 직접적으로 소멸될 위험이 있습니다.</li>
-                            <li><strong>불확실성:</strong> 분할 시 매각 가격, 조건, 이후 사업 관계 등이 매우 불투명하여 리스크 평가가 어렵습니다. 이에 따라, 사업의 근간이 흔들릴 수 있다는 점을 감안하여 높은 리스크 비율(40%)을 적용했습니다.</li>
-                        </ul>
-                    </div>
-                    <div class="prose prose-slate max-w-none">
-                        <h4>구독, 플랫폼 및 기기 (리스크 영향분: 약 20%)</h4>
-                        <p>이 부문의 핵심 리스크는 구글 플레이 스토어의 결제 정책 변경 강제입니다.</p>
-                        <ul>
-                            <li><strong>수수료(Take-rate) 감소:</strong> Epic Games 소송 및 각국 규제 당국은 구글이 인앱결제 시 부과하는 15~30%의 수수료를 문제 삼고 있습니다. 대체 결제 시스템이 전면 허용될 경우, 구글의 평균 수수료율이 5~10%p 하락할 수 있습니다.</li>
-                            <li><strong>재무적 영향:</strong> 이 부문 연간 매출(약 350억 달러)에서 수수료율이 5%p 하락한다고 가정하면, <strong class="text-red-600">연간 약 17.5억 달러</strong>의 직접적인 매출 및 이익 감소가 발생할 수 있습니다. 이를 반영하여 리스크 영향분을 20%로 추정했습니다.</li>
-                        </ul>
+                        <h4>2. 차트 '리스크 영향분' 산정 최종 결론</h4>
+                        <p>본 차트에 표시된 '리스크 영향분'은 개별 규제가 현실화되었을 때 발생할 수 있는 **부정적 이익 감소** 측면을 시각화하기 위한 것입니다. 따라서 가장 가능성이 높은 리스크인 Ad-Tech 규제(-19억 달러)와 Play Store 규제(-10억 달러)의 영향을 종합하여, 이를 각 사업부의 특성에 맞게 리스크 비율로 분배하여 적용했습니다. Apple TAC 시나리오의 복합적 영향(단기 이익 증가, 장기 성장 둔화)은 별도로 고려되어야 합니다.</p>
                     </div>
                  </div>
             </div>
@@ -243,7 +245,7 @@
                 { date: '2023-01-24', title: 'DOJ, 광고 기술 독점 소송 추가 제기', icon: '⚖️', details: '광고 기술(Ad-Tech) 스택의 불법적 독점 혐의로 추가 소송. 광고 서버, 거래소 등 광고 생태계 전반의 지배력 남용을 문제 삼음.'},
                 { date: '2023-12-11', title: '에픽게임즈, 플레이스토어 소송 승소', icon: '🏆', details: '배심원단이 구글 플레이스토어의 앱 유통 및 결제 정책이 반경쟁적이라고 평결. 구글의 앱 마켓 통제력에 큰 타격.'},
                 { date: '2023-12-19', title: '구글, 주정부 연합과 7억 달러 합의', icon: '🤝', details: '플레이스토어 관련 반독점 소송에서 50개 주와 합의. 대체 결제 시스템 허용 등 운영 방식 변경을 약속.'},
-                { date: '2024-03-07', title: 'EU 디지털시장법(DMA) 전면 시행', icon: '�🇺', details: '구글을 게이트키퍼로 지정, 자사 서비스 우대 금지, 제3자 서비스와의 상호운용성 보장 등 강력한 사전 규제 적용 시작.'},
+                { date: '2024-03-07', title: 'EU 디지털시장법(DMA) 전면 시행', icon: '🇪🇺', details: '구글을 게이트키퍼로 지정, 자사 서비스 우대 금지, 제3자 서비스와의 상호운용성 보장 등 강력한 사전 규제 적용 시작.'},
                 { date: '2024-08-05', title: 'DOJ 검색 소송 1심, 구글 패소 판결', icon: 'GAVEL', details: '법원이 구글이 일반 검색 서비스 시장에서 불법적으로 독점을 유지했다고 판결. 시정 조치 논의가 본격화됨.'},
                 { date: '2025-04-18', title: 'DOJ 광고 기술 소송 1심, 구글 패소 판결', icon: 'GAVEL', details: '버지니아 법원이 구글의 광고 기술 사업이 독점적 지위를 남용했다고 판결. 광고 사업부 매각 가능성 대두.'},
                 { date: '2025-08-15', title: '전망: 검색 소송 시정조치 판결 예정', icon: '🔮', details: 'DOJ는 크롬 브라우저 매각, 기본 검색 계약 금지 등 강력한 구조적 시정 조치를 요구 중. 판결 내용에 따라 구글 사업 모델의 근간이 흔들릴 수 있음.'},
@@ -434,4 +436,3 @@
     </script>
 </body>
 </html>
-�
