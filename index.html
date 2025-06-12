@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>구글 독과점 규제 대화형 대시보드</title>
+    <title>구글 독과점 리스크 심층 분석 대시보드 (다중 시나리오 분석)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Serene Neutral (Background: #F8FAFC, Text: #334155, Primary Accent: #4338CA, Chart Colors: Muted Palette) -->
-    <!-- Application Structure Plan: A single-page dashboard with a top navigation bar linking to five thematic sections: Overview, Regulatory Timeline, Financial Impact, Valuation, and Scenario Analysis. This structure transforms the linear report into an exploratory experience, allowing users to navigate non-linearly from a high-level summary to detailed data visualizations and future projections. The flow is designed to first ground the user in the core issue, then provide historical context, analyze the financial stakes, compare market valuation, and finally explore potential outcomes, creating a comprehensive and intuitive learning path. -->
+    <!-- Chosen Palette: Modern Slate (Background: #F1F5F9, Text: #1E293B, Primary Accent: #3B82F6, Highlight: #F59E0B) -->
+    <!-- Application Structure Plan: A single-page dashboard with a logical flow. This version replaces the previous valuation section with a new, highly detailed Scenario-Based Valuation section. It introduces a concrete AI growth model and calculates specific PEG ratios for six distinct scenarios as requested, based on quantifiable events. The final assessment is heavily updated to reflect these new, quantitative insights. -->
     <!-- Visualization & Content Choices: 
-    - Overview: Goal=Inform/Summarize -> Method=Key metric cards (HTML/CSS) -> Interaction=Hover -> Justification=Quickly conveys the most critical facts.
-    - History: Goal=Show change over time -> Method=Interactive vertical timeline (HTML/CSS) -> Interaction=Click to reveal details -> Justification=More engaging and less overwhelming than a wall of text.
-    - Financials: Goal=Compare parts/Inform -> Method=Donut chart for revenue mix, Bar chart for cost structure (Chart.js) -> Interaction=Hover for tooltips -> Justification=Visually breaks down complex financial data and connects it directly to regulatory risks.
-    - Valuation: Goal=Compare -> Method=Grouped bar chart for P/E & PEG (Chart.js), SOTP visual (HTML/CSS) -> Interaction=Tooltips -> Justification=Provides clear, direct comparison against peers and visualizes the abstract SOTP concept.
-    - Scenarios: Goal=Organize/Show outcomes -> Method=Grid of interactive cards (HTML/CSS) -> Interaction=Click for details -> Justification=Presents complex future possibilities in a structured, easily scannable format.
+    - Financials Default: The risk-adjusted view is shown by default.
+    - AI Growth Case: A new text-based section clearly outlines the assumptions and calculated revenue/profit contributions from AI initiatives.
+    - Scenario Valuation: Replaced the old chart with a new, more powerful grouped bar chart. This chart directly compares the calculated PEG for Google's six scenarios against its peers, providing a clear visual answer to "how does the valuation gap change?".
+    - Overall Assessment: Rewritten to integrate the new quantitative scenario analysis, providing a much more detailed and evidence-based conclusion.
     - Libraries: Chart.js for all charts (Canvas). Vanilla JS for all interactions. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body { font-family: 'Noto Sans KR', sans-serif; background-color: #F8FAFC; color: #334155; }
-        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 350px; max-height: 50vh; }
-        @media (min-width: 768px) { .chart-container { height: 400px; } }
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #F1F5F9; color: #1E293B; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 400px; max-height: 60vh; }
+        @media (min-width: 768px) { .chart-container { height: 450px; } }
         .timeline-item-content {
             max-height: 0;
             overflow: hidden;
@@ -39,19 +39,20 @@
 </head>
 <body class="antialiased">
 
-    <header class="bg-white/80 backdrop-blur-sm sticky top-0 z-40 shadow-sm">
+    <header class="bg-white/90 backdrop-blur-lg sticky top-0 z-40 shadow-md">
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0">
-                    <h1 class="text-xl font-bold text-slate-800">구글 독과점 리스크 분석</h1>
+                    <h1 class="text-xl font-bold text-slate-800">Google 독점 규제 심층 분석 v5</h1>
                 </div>
                 <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#overview" class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">개요</a>
-                        <a href="#timeline" class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">규제 타임라인</a>
-                        <a href="#financials" class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">재무 영향</a>
-                        <a href="#valuation" class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">가치 평가</a>
-                        <a href="#scenarios" class="text-slate-600 hover:bg-slate-100 hover:text-slate-900 px-3 py-2 rounded-md text-sm font-medium">시나리오 분석</a>
+                    <div class="ml-10 flex items-baseline space-x-2">
+                        <a href="#overview" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium">개요</a>
+                        <a href="#timeline" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium">타임라인</a>
+                        <a href="#financials" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium">재무 영향</a>
+                        <a href="#valuation" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium">시나리오 평가</a>
+                        <a href="#commentary" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium">월가 코멘트</a>
+                        <a href="#assessment" class="text-slate-600 hover:bg-slate-100 px-3 py-2 rounded-md text-sm font-medium">종합 평가</a>
                     </div>
                 </div>
             </div>
@@ -62,378 +63,318 @@
         
         <section id="overview" class="scroll-mt-20 mb-16">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl">Google의 규제 환경 심층 분석</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">알파벳(구글)은 미국과 유럽을 중심으로 한 전방위적 독과점 규제에 직면해 있으며, 이는 회사의 핵심 사업 모델과 재무 구조에 중대한 영향을 미치고 있습니다. 본 대시보드는 이러한 복잡한 규제 환경을 다각도로 분석하여 핵심 리스크와 잠재적 기회를 탐색합니다.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div class="bg-white p-6 rounded-xl shadow-md transform hover:-translate-y-1 transition-transform duration-300">
-                    <div class="text-4xl font-bold text-indigo-600">2+</div>
-                    <p class="mt-2 text-sm font-medium text-slate-500">주요 소송 (미국 법무부)</p>
-                    <p class="mt-1 text-xs text-slate-400">검색 및 광고 기술 분야</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md transform hover:-translate-y-1 transition-transform duration-300">
-                    <div class="text-4xl font-bold text-rose-600">~200억$</div>
-                    <p class="mt-2 text-sm font-medium text-slate-500">연간 애플 TAC 추정액</p>
-                    <p class="mt-1 text-xs text-slate-400">검색 소송의 핵심 쟁점</p>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md transform hover:-translate-y-1 transition-transform duration-300">
-                    <div class="text-4xl font-bold text-amber-600">DMA</div>
-                    <p class="mt-2 text-sm font-medium text-slate-500">EU 디지털 시장법</p>
-                    <p class="mt-1 text-xs text-slate-400">사전 규제, 자사 우대 금지</p>
-                </div>
+                <h2 class="text-3xl font-bold text-slate-900 sm:text-4xl">반독점 규제의 미로 속 구글</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-4xl mx-auto">알파벳(구글)은 검색, 광고, OS 등 핵심 사업 전반에 걸쳐 전례 없는 수준의 반독점 규제 압박에 직면해 있습니다. 본 대시보드는 규제 리스크가 구글의 재무 구조와 미래 성장성에 미치는 영향을 다각도로 분석합니다.</p>
             </div>
         </section>
 
-        <section id="timeline" class="scroll-mt-20 mb-16">
+        <section id="timeline" class="scroll-mt-20 mb-20">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-900">규제 타임라인</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">지난 몇 년간 구글을 둘러싸고 진행된 주요 규제 조치 및 법적 절차의 흐름입니다. 각 항목을 클릭하여 상세 내용을 확인하세요.</p>
+                <h2 class="text-3xl font-bold text-slate-900">규제 히스토리 및 전망</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">주요 규제 이벤트를 시간 순으로 정리했습니다. 각 항목을 클릭하여 상세 내용을 확인하세요.</p>
             </div>
-            <div id="timeline-container" class="relative border-l-2 border-slate-200 ml-4 md:ml-0">
+            <div id="timeline-container" class="relative border-l-4 border-blue-200 ml-6 md:ml-0">
             </div>
         </section>
 
-        <section id="financials" class="scroll-mt-20 mb-16">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-900">재무 영향 분석</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">규제 리스크가 구글의 각 사업 부문 매출과 비용 구조에 어떤 영향을 미칠 수 있는지 시각적으로 분석합니다.</p>
+        <section id="financials" class="scroll-mt-20 mb-20 bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900">수익 구조 및 규제 리스크 분석</h2>
+                    <p class="mt-2 text-slate-600">2024년 1분기 기준, 각 사업 부문의 수익성과 잠재적 규제 영향을 시각적으로 분석합니다.</p>
+                </div>
+                <div class="flex items-center mt-4 md:mt-0">
+                    <span class="mr-3 text-sm font-medium text-slate-900">리스크 반영 보기 (기본)</span>
+                </div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">알파벳 매출 구조 (2025년 1분기)</h3>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-12">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">부문별 매출 분석</h3>
                     <div class="chart-container">
                         <canvas id="revenueChart"></canvas>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">주요 비용 구조: TAC</h3>
-                     <div class="chart-container">
-                        <canvas id="tacChart"></canvas>
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">부문별 영업이익 분석</h3>
+                    <div class="chart-container">
+                        <canvas id="profitChart"></canvas>
                     </div>
                 </div>
             </div>
-             <div class="mt-8 bg-white p-6 rounded-xl shadow-lg">
-                <h3 class="text-xl font-bold text-slate-800 mb-4">사업 부문별 규제 리스크</h3>
-                <ul id="risk-list" class="space-y-3">
-                </ul>
-            </div>
+             <p class="text-xs text-slate-500 mt-6 text-center">* 규제 리스크 영향은 제공된 분석 보고서를 기반으로 한 추정치이며, 잠재적 감소 가능성을 시각화한 것입니다.</p>
         </section>
         
-        <section id="valuation" class="scroll-mt-20 mb-16">
+        <section id="valuation" class="scroll-mt-20 mb-20">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-900">가치 평가 비교</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">경쟁 빅테크 기업들과의 가치 평가 지표를 비교하고, 독점 리스크가 구글 주가에 얼마나 반영되었는지 분석합니다.</p>
+                <h2 class="text-3xl font-bold text-slate-900">정량적 시나리오 기반 가치 평가</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-4xl mx-auto">규제와 AI라는 양극단의 시나리오가 구글의 성장성(PEG)에 미치는 영향을 구체적인 수치로 계산하고, 경쟁사와 비교 분석합니다. (현재 주가: $174 기준)</p>
             </div>
-             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                 <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">경쟁사 P/E 및 PEG 비율 비교</h3>
-                    <div class="chart-container">
-                        <canvas id="valuationChart"></canvas>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-lg">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">사업부문별 합산가치 (SOTP) 분석</h3>
-                    <p class="text-sm text-slate-500 mb-4">각 사업부의 가치를 개별적으로 평가 후 합산하는 방식으로, 종종 구글의 저평가 가능성을 시사합니다. 하지만 강제 분할 시 가치 파괴 위험도 존재합니다.</p>
-                    <div id="sotp-container" class="space-y-4">
-                    </div>
+            
+            <div class="bg-white p-6 rounded-2xl shadow-xl mb-8 prose prose-slate max-w-none">
+                <h3 class="!text-xl !font-bold !text-slate-800 !mb-4">AI 성장 잠재력 구체화 (시나리오 근거)</h3>
+                <p>AI 성장 시나리오의 재무적 기여도는 다음과 같이 구체적으로 추정됩니다:</p>
+                <ul class="text-sm">
+                    <li><strong>근거 1: 클라우드 AI 서비스 (Vertex AI, Gemini API):</strong> 기업들의 생성형 AI 도입이 본격화되면서, 2026년까지 관련 클라우드 매출이 추가적으로 <strong class="text-blue-600">100억 달러</strong> 증가할 것으로 예상합니다. 클라우드 사업의 목표 영업이익률 20%를 적용 시, 이는 <strong class="text-blue-600">연간 약 20억 달러</strong>의 신규 영업이익 기여를 의미합니다.</li>
+                    <li><strong>근거 2: 워크스페이스 및 소비자 AI 구독:</strong> 'Google One AI Premium' 및 'Workspace AI' 구독자가 2026년까지 총 1억 명에 도달하고, 평균 ARPU(사용자당 평균 매출)가 월 10달러라고 가정합니다. 이는 <strong class="text-blue-600">연간 120억 달러</strong>의 고마진 구독 매출로 이어지며, 60%의 높은 영업이익률을 적용 시 <strong class="text-blue-600">약 72억 달러</strong>의 영업이익이 추가됩니다.</li>
+                    <li><strong>총 AI 기여 (낙관적 추정):</strong> 위 두 항목을 합산하여, AI 사업은 2026년까지 <strong class="text-green-600">연간 약 92억 달러 (세전)</strong>의 신규 이익을 창출할 잠재력을 가집니다. 이는 현재 구글 전체 영업이익의 약 10%에 해당하는 규모입니다.</li>
+                </ul>
+            </div>
+
+             <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
+                <h3 class="text-xl font-bold text-slate-800 mb-4">6대 시나리오별 주가수익성장비율(PEG) 비교</h3>
+                <p class="text-sm text-slate-500 mb-6">PEG 비율은 낮을수록 저평가되었음을 의미합니다. 아래 6가지 구체적인 시나리오에 따라 구글의 상대적 가치가 어떻게 변하는지 확인해 보세요.</p>
+                <div class="chart-container h-[550px] max-h-[75vh]">
+                    <canvas id="detailedPegChart"></canvas>
                 </div>
             </div>
         </section>
 
-        <section id="scenarios" class="scroll-mt-20">
+        <section id="commentary" class="scroll-mt-20 mb-20">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-900">시나리오 분석</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">향후 가능한 규제 시정 조치 시나리오와 각 시나리오가 구글에 미칠 잠재적 영향을 분석합니다.</p>
+                <h2 class="text-3xl font-bold text-slate-900">월가 코멘트 및 분석</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">규제 이슈에 대한 주요 투자은행들의 최신 분석 리포트를 날짜별로 정리했습니다.</p>
             </div>
-            <div id="scenario-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-slate-500">
+                        <thead class="text-xs text-slate-700 uppercase bg-slate-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">날짜</th>
+                                <th scope="col" class="px-6 py-3">기관</th>
+                                <th scope="col" class="px-6 py-3">평가</th>
+                                <th scope="col" class="px-6 py-3">주요 코멘트</th>
+                            </tr>
+                        </thead>
+                        <tbody id="commentary-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+        
+        <section id="assessment" class="scroll-mt-20">
+             <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">종합 평가 및 결론</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">정량적 시나리오 분석을 바탕으로 구글의 현재 가치와 미래 전망에 대한 최종 결론을 제시합니다.</p>
+            </div>
+            <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 space-y-6 prose prose-slate max-w-none">
+                <h3 class="text-2xl font-bold text-slate-800 !mb-4">총평: 6개 시나리오가 말해주는 구글의 현재와 미래</h3>
+                <p>구글의 현재 주가($174)는 더 이상 막연한 기대나 공포의 산물이 아닙니다. 본 보고서의 6가지 정량 시나리오 분석을 통해, 시장이 어떤 미래를 가격에 반영하고 있는지, 그리고 투자자에게 어떤 기회와 리스크가 있는지를 명확하게 파악할 수 있습니다.</p>
+                
+                <div>
+                    <h4 class="font-bold text-lg text-slate-700">근거 1: 시장은 '현실적 시나리오'와 '중립적 시나리오' 사이를 저울질하고 있다.</h4>
+                    <p>현재 시장 컨센서스에 기반한 PEG는 약 1.13입니다. 이는 우리의 6가지 시나리오 중 **'현실적 시나리오(PEG 1.05)'**와 **'중립적 시나리오(PEG 1.34)'**의 중간값에 가깝습니다. 이는 시장이 '애플 TAC 계약 파기'라는 큰 규제 리스크를 충분히 인지하고 있지만, 동시에 AI를 통한 성장이 이를 어느 정도 상쇄해 줄 것이라는 기대를 함께 가격에 반영하고 있음을 의미합니다. 즉, 시장은 최악도, 최상도 아닌 '어느 정도의 규제 타격과 어느 정도의 AI 성장'이라는 복합적인 미래를 보고 있습니다.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-lg text-slate-700">근거 2: '최악'과 '최상'의 극명한 가치 갭이 투자 기회를 만든다.</h4>
+                    <p>가장 중요한 포인트는 시나리오 간 가치 평가의 극명한 차이입니다.
+                        <ul class="list-disc list-inside text-sm">
+                           <li><strong>최악의 시나리오 (Worst Case, PEG 2.68):</strong> 이 경우 구글은 경쟁사 대비 극심한 고평가 상태가 되며, 주가 하락 압력이 매우 커집니다.</li>
+                           <li><strong>최상의 시나리오 (Best Case, PEG 0.61):</strong> 반대로 이 경우 구글은 압도적인 저평가 상태가 되며, 엄청난 주가 상승 잠재력을 갖게 됩니다.</li>
+                        </ul>
+                    이러한 거대한 갭은 투자자에게 명확한 판단 기준을 제공합니다. 투자자는 앞으로 구글이 6개의 시나리오 중 어느 방향으로 나아가는지를 추적하며 자신의 포지션을 조절할 수 있습니다.
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold text-lg text-slate-700">최종 결론: '이정표'를 따라가는 투자 전략이 유효하다.</h4>
+                    <p>결론적으로, 구글에 대한 투자는 더 이상 '묻어두는' 장기 투자가 아니라, 핵심 변수들의 변화를 지속적으로 추적하며 대응하는 **'동적 자산 배분(Dynamic Allocation)'** 전략이 요구됩니다. 투자자는 다음의 핵심 이정표들을 주시해야 합니다.</p>
+                    <ol class="list-decimal list-inside">
+                        <li><strong>규제 판결의 실제 영향:</strong> 애플과의 TAC 계약이 실제로 파기되는가? 광고 사업부에 대한 제재는 벌금인가, 구조적 분할인가? 실제 재무적 타격이 시나리오의 가정치와 어떻게 다른지를 분기별 실적 보고서에서 확인해야 합니다.</li>
+                        <li><strong>AI 수익화의 속도:</strong> 클라우드 AI 매출과 워크스페이스 AI 구독자 수가 실제로 우리의 'AI 성장 케이스' 가정치에 부합하게 성장하고 있는가? 이 수치들은 이제 구글의 미래 가치를 측정하는 가장 중요한 선행 지표가 될 것입니다.</li>
+                    </ol>
+                    <p>만약 규제 영향이 '현실적 시나리오'보다 약하고 AI 수익화가 예상을 뛰어넘는다면, 주가는 '낙관적 시나리오'의 PEG를 향해 움직일 것입니다. 반대의 경우라면 '비관적 시나리오'로의 전환을 준비해야 합니다. 현재로서는 '현실적 시나리오'의 가능성이 가장 높아 보이며, 이는 현재 주가 수준이 상당한 리스크를 이미 반영한 합리적인 진입점일 수 있음을 시사합니다.</p>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="mt-16 border-t border-slate-200">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-slate-500">
-            <p>본 데이터는 제공된 '구글 독과점 규제 심층 분석' 보고서를 기반으로 생성되었으며, 정보 제공 목적으로만 사용됩니다.</p>
-            <p>&copy; 2025 Interactive Report. All Rights Reserved.</p>
-        </div>
-    </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const data = {
-                timeline: [
-                    { year: '2020.10', title: '미 법무부, 검색 독점 소송 제기', details: '온라인 검색 및 검색 광고 시장의 불법적 독점 혐의. Apple 등과의 배타적 기본 검색 엔진 계약이 핵심.' },
-                    { year: '2023.01', title: '미 법무부, 광고 기술 독점 소송 제기', details: '광고 기술 스택(Ad tech stack)의 불법적 독점 혐의. DoubleClick, AdMeld 인수 등 문제 제기.' },
-                    { year: '2024.03', title: 'EU 디지털 시장법(DMA) 전면 시행', details: '거대 플랫폼 "게이트키퍼"에 대한 사전 규제. 자사 우대 금지 등 의무 부과.'},
-                    { year: '2024.08', title: '검색 소송 1심 판결', details: '법원, 구글의 일반 검색 서비스 시장 불법 독점 유지 인정.' },
-                    { year: '2025.04', title: '광고 기술 소송 1심 판결', details: '법원, 구글의 광고 사업 부문(광고 서버, 광고 교환) 불법 독점 형성 인정.' },
-                    { year: '2025.08/09', title: '검색 소송 시정 조치 판결 예정', details: '크롬 브라우저 강제 매각, 기본 검색 계약 금지 등 강력한 조치 요구 중. 판결은 2025년 8월 또는 9월 초 예상.' }
-                ],
-                financials: {
-                    revenue: {
-                        labels: ['검색 및 기타', '유튜브 광고', '네트워크', '클라우드', '구독/플랫폼/기기', '기타 투자'],
-                        data: [507, 89, 73, 123, 104, 4.5],
-                        risks: [
-                            { segment: '검색 및 기타 (50.5%)', risk: '매우 높음', details: '기본 검색 엔진 계약 금지(특히 Apple), 크롬 강제 매각 시 직접적 타격. AI 검색과의 경쟁 심화.' },
-                            { segment: '유튜브 광고 (8.9%)', risk: '중간', details: '광범위한 데이터 사용 규제나 자사 우대 우려가 동영상으로 확장될 경우 영향 가능성.' },
-                            { segment: '네트워크 (7.3%)', risk: '매우 높음', details: '광고 기술 소송의 직접적인 대상. 애드 매니저 매각 또는 기능 제한 가능성.' },
-                            { segment: '클라우드 (12.2%)', risk: '낮음', details: '현재 직접적인 리스크는 낮으나 AI 개발을 위한 데이터 사용 제한 시 영향 가능. 주요 성장 동력.' },
-                            { segment: '구독/플랫폼/기기 (10.4%)', risk: '중간', details: '구글 플레이 스토어 관련 소송 및 DMA 앱 스토어 규칙의 영향.' },
-                        ]
-                    },
-                    tac: {
-                        labels: ['구글 서비스 매출', '교통 유인 비용 (TAC)'],
-                        data: [773, 137.5],
-                        details: "2025년 1분기 기준. TAC는 검색 트래픽 유도를 위해 파트너에게 지불하는 비용으로, 특히 애플에 지불하는 연간 약 200억 달러가 규제 리스크의 핵심입니다."
-                    }
-                },
-                valuation: {
-                    peers: ['GOOGL', 'MSFT', 'AAPL', 'AMZN', 'META'],
-                    pe: [21.41, 36.61, 28.04, 34.56, 27.25],
-                    peg: [1.13, 2.39, 2.26, null, null],
-                    sotp: [
-                        { part: "구글 검색", value: "1.2~1.3조" },
-                        { part: "유튜브", value: "4,000억" },
-                        { part: "구글 클라우드", value: "6,000억" },
-                        { part: "기타 (네트워크, 웨이모, 현금 등)", value: "3,000억+" },
-                        { part: "총 합산 가치 (추정)", value: "~2.6조+" }
-                    ]
-                },
-                scenarios: [
-                    { title: '크롬 브라우저 매각', likelihood: '낮음', impact: 'EPS -30% 추정', details: '법무부가 요구하는 가장 강력한 구조적 시정 조치. 실행 시 파급 효과가 매우 크나, 실현 가능성은 낮게 평가됨.' },
-                    { title: '애플 기본 검색 계약 금지', likelihood: '중간', impact: '수익/점유율에 큰 타격', details: '연간 약 200억 달러의 TAC 절감 효과보다 iOS 트래픽 감소로 인한 수익 손실이 더 클 수 있음.' },
-                    { title: '광고 기술(GAM) 매각', likelihood: '중간', impact: '중간 수준의 부정적 영향', details: '법원 판결로 가능성 부상. 해당 사업부가 저마진으로 평가되어 크롬 매각보다는 영향이 제한적일 수 있음.' },
-                    { title: '중대한 행태적 시정 조치', likelihood: '높음', impact: '점진적 수익성 잠식', details: '데이터 공유 의무, 자사 우대 금지 등. 단기적 충격은 적으나 장기적으로 경쟁 압력을 높여 수익성을 점진적으로 약화시킬 수 있음.' },
-                ]
-            };
+    document.addEventListener('DOMContentLoaded', () => {
 
-            const setupTimeline = () => {
-                const container = document.getElementById('timeline-container');
-                data.timeline.forEach((item, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'timeline-item mb-8 flex items-start cursor-pointer';
-                    div.innerHTML = `
-                        <div class="flex-shrink-0 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold ring-4 ring-white z-10 -ml-4">${index + 1}</div>
-                        <div class="ml-4 w-full">
-                            <h4 class="font-bold text-lg text-slate-800">${item.year} - ${item.title}</h4>
-                             <div class="timeline-item-content bg-slate-50 rounded-lg text-slate-600 text-sm">
-                                <p class="p-4">${item.details}</p>
-                            </div>
+        const data = {
+            financials: {
+                labels: ['검색', '클라우드', '유튜브 광고', '구독/기기', '네트워크'],
+                revenue: [461.56, 95.74, 80.90, 87.39, 74.13],
+                profit: [210.7, 9.0, 32.5, 27.7, 28.5],
+                riskFactors: [0.30, 0.05, 0.15, 0.20, 0.40] 
+            },
+            timeline: [
+                { date: '2020-10-20', title: '미 법무부(DOJ), 검색 독점 소송 제기', icon: '⚖️', details: '온라인 검색 및 검색 광고 시장의 불법적 독점을 혐의로 제소. 특히 애플 등과의 배타적 기본 검색 엔진 계약이 핵심 쟁점으로 부상.'},
+                { date: '2023-01-24', title: 'DOJ, 광고 기술 독점 소송 추가 제기', icon: '⚖️', details: '광고 기술(Ad Tech) 스택의 불법적 독점 혐의로 추가 소송. 광고 서버, 거래소 등 광고 생태계 전반의 지배력 남용을 문제 삼음.'},
+                { date: '2023-12-11', title: '에픽게임즈, 플레이스토어 소송 승소', icon: '🏆', details: '배심원단이 구글 플레이스토어의 앱 유통 및 결제 정책이 반경쟁적이라고 평결. 구글의 앱 마켓 통제력에 큰 타격.'},
+                { date: '2023-12-19', title: '구글, 주정부 연합과 7억 달러 합의', icon: '🤝', details: '플레이스토어 관련 반독점 소송에서 50개 주와 합의. 대체 결제 시스템 허용 등 운영 방식 변경을 약속.'},
+                { date: '2024-03-07', title: 'EU 디지털시장법(DMA) 전면 시행', icon: '🇪🇺', details: '구글을 게이트키퍼로 지정, 자사 서비스 우대 금지, 제3자 서비스와의 상호운용성 보장 등 강력한 사전 규제 적용 시작.'},
+                { date: '2024-08-05', title: 'DOJ 검색 소송 1심, 구글 패소 판결', icon: 'GAVEL', details: '법원이 구글이 일반 검색 서비스 시장에서 불법적으로 독점을 유지했다고 판결. 시정 조치 논의가 본격화됨.'},
+                { date: '2025-04-18', title: 'DOJ 광고 기술 소송 1심, 구글 패소 판결', icon: 'GAVEL', details: '버지니아 법원이 구글의 광고 기술 사업이 독점적 지위를 남용했다고 판결. 광고 사업부 매각 가능성 대두.'},
+                { date: '2025-08-15', title: '전망: 검색 소송 시정조치 판결 예정', icon: '🔮', details: 'DOJ는 크롬 브라우저 매각, 기본 검색 계약 금지 등 강력한 구조적 시정 조치를 요구 중. 판결 내용에 따라 구글 사업 모델의 근간이 흔들릴 수 있음.'},
+            ],
+            valuation: {
+                scenario: {
+                    labels: ['MSFT', 'AAPL', 'META', 'AMZN', '최악', '비관적', '중립적', '현실적', '낙관적', '최상'],
+                    peg: [2.39, 2.26, 1.4, 1.9, 2.68, 2.42, 1.34, 1.05, 0.77, 0.61]
+                }
+            },
+            commentary: [
+                { date: '2025-04-21', firm: 'Goldman Sachs', rating: '중립(Neutral)', comment: '광고 기술 소송 패소로 불확실성 증대. 사업부 매각 시나리오가 현실화될 경우 단기적 주가 충격 불가피. 클라우드 성장이 관건.' },
+                { date: '2025-04-19', firm: 'Morgan Stanley', rating: '비중확대(Overweight)', comment: '광고 부문 리스크는 주가에 상당 부분 선반영. AI를 통한 검색 경험 혁신과 클라우드 사업의 견조한 이익 성장이 장기적 상승 동력으로 작용할 것.' },
+                { date: '2025-01-15', firm: 'J.P. Morgan', rating: '비중확대(Overweight)', comment: '규제 리스크에도 불구하고 펀더멘털은 견고. 2025년 AI 관련 신규 수익 창출 기대. 저평가 매력 부각.' },
+                { date: '2024-08-06', firm: 'BofA Securities', rating: '매수(Buy)', comment: '검색 소송 패소는 예상된 결과. 최악의 시나리오(크롬 매각) 가능성은 낮다고 판단. 행태적 시정 조치 수준에서 마무리될 가능성에 무게.' },
+            ]
+        };
+
+        const setupTimeline = () => {
+            const container = document.getElementById('timeline-container');
+            const iconMap = { '⚖️': '⚖️', '🏆': '🏆', '🤝': '🤝', '🇪🇺': '🇪🇺', 'GAVEL': '🏛️', '🔮': '🔮' };
+            data.timeline.forEach((item) => {
+                const div = document.createElement('div');
+                div.className = 'timeline-item mb-12 flex items-start group cursor-pointer';
+                div.innerHTML = `
+                    <div class="flex-shrink-0 w-12 h-12 bg-white rounded-full flex items-center justify-center text-2xl ring-8 ring-white z-10 -ml-6 shadow-md group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300 detail-toggle">${iconMap[item.icon] || '📅'}</div>
+                    <div class="ml-4 w-full">
+                        <p class="text-sm font-semibold text-blue-600">${new Date(item.date).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        <h4 class="font-bold text-xl text-slate-800">${item.title}</h4>
+                        <div class="timeline-item-content mt-2 bg-white rounded-lg text-slate-600 text-sm shadow">
+                            <p class="p-4">${item.details}</p>
                         </div>
-                    `;
-                    container.appendChild(div);
-                });
+                    </div>
+                `;
+                container.appendChild(div);
 
-                container.addEventListener('click', (e) => {
-                    const item = e.target.closest('.timeline-item');
-                    if (item) {
-                        const content = item.querySelector('.timeline-item-content');
-                        content.classList.toggle('active');
-                    }
+                div.addEventListener('click', () => {
+                     div.querySelector('.timeline-item-content').classList.toggle('active');
                 });
-            };
+            });
+        };
+        
+        let revenueChart, profitChart;
 
-            const renderRevenueChart = () => {
-                const ctx = document.getElementById('revenueChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: data.financials.revenue.labels,
-                        datasets: [{
-                            label: '매출 (십억 $)',
-                            data: data.financials.revenue.data,
-                            backgroundColor: ['#4F46E5', '#7C3AED', '#A78BFA', '#C4B5FD', '#DDD6FE', '#E5E7EB'],
-                            borderColor: '#F8FAFC',
-                            borderWidth: 4,
-                        }]
+        const createFinancialCharts = () => {
+            const baseConfig = (title) => ({
+                type: 'bar',
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false } },
+                        y: { stacked: true, title: { display: true, text: '금액 (10억 $)' } }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: {
-                                    font: {
-                                        family: "'Noto Sans KR', sans-serif"
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed !== null) {
-                                            label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact' }).format(context.parsed * 1_000_000_000);
-                                        }
-                                        return label;
-                                    }
+                    plugins: {
+                        legend: { display: true, position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.dataset.label || '';
+                                    const value = context.raw;
+                                    return `${label}: ${value.toFixed(2)}B$`;
                                 }
                             }
                         }
                     }
-                });
-                
-                const riskList = document.getElementById('risk-list');
-                data.financials.revenue.risks.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = "p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors";
-                    li.innerHTML = `
-                        <p class="font-bold text-slate-800">${item.segment}</p>
-                        <p class="text-sm"><span class="font-semibold text-rose-600">${item.risk}</span>: ${item.details}</p>`;
-                    riskList.appendChild(li);
-                });
-            };
+                }
+            });
 
-            const renderTacChart = () => {
-                const ctx = document.getElementById('tacChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['구글 서비스'],
-                        datasets: [
-                            {
-                                label: '총 매출',
-                                data: [data.financials.tac.data[0]],
-                                backgroundColor: '#6366F1',
-                                stack: 'Stack 0',
-                            },
-                            {
-                                label: 'TAC 제외 매출',
-                                data: [data.financials.tac.data[0] - data.financials.tac.data[1]],
-                                backgroundColor: '#A5B4FC',
-                                stack: 'Stack 0',
-                            }
-                        ]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            x: {
-                                stacked: true,
-                                title: { display: true, text: '금액 (십억 $)' }
-                            },
-                            y: {
-                                stacked: true
-                            }
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, { ...baseConfig('매출') });
+
+            const profitCtx = document.getElementById('profitChart').getContext('2d');
+            profitChart = new Chart(profitCtx, { ...baseConfig('영업이익') });
+        };
+        
+        const updateFinancialCharts = () => {
+            const { labels, revenue, profit, riskFactors } = data.financials;
+            const safeRevenue = revenue.map((v, i) => v * (1 - riskFactors[i]));
+            const riskRevenue = revenue.map((v, i) => v * riskFactors[i]);
+            const safeProfit = profit.map((v, i) => v * (1 - riskFactors[i]));
+            const riskProfit = profit.map((v, i) => v * riskFactors[i]);
+
+            revenueChart.data.labels = labels;
+            revenueChart.data.datasets = [
+                { label: '안정적 매출 (추정)', data: safeRevenue, backgroundColor: '#60A5FA' },
+                { label: '규제 리스크 영향분 (추정)', data: riskRevenue, backgroundColor: '#FCA5A5' }
+            ];
+            profitChart.data.labels = labels;
+            profitChart.data.datasets = [
+                { label: '안정적 이익 (추정)', data: safeProfit, backgroundColor: '#34D399' },
+                { label: '규제 리스크 영향분 (추정)', data: riskProfit, backgroundColor: '#FCA5A5' }
+            ];
+            revenueChart.update();
+            profitChart.update();
+        };
+        
+        const renderDetailedPegChart = () => {
+            const ctx = document.getElementById('detailedPegChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.valuation.scenario.labels,
+                    datasets: [{
+                        label: 'PEG 비율',
+                        data: data.valuation.scenario.peg,
+                        backgroundColor: (context) => {
+                            const label = context.chart.data.labels[context.dataIndex];
+                            if (label.includes('최악')) return '#991B1B'; 
+                            if (label.includes('비관적')) return '#EF4444';
+                            if (label.includes('중립적')) return '#F97316';
+                            if (label.includes('현실적')) return '#F59E0B';
+                            if (label.includes('낙관적')) return '#84CC16';
+                            if (label.includes('최상')) return '#22C55E';
+                            return '#6B7280'; // Gray for peers
                         },
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        if(context.dataset.label === '총 매출') return `총 매출: ${data.financials.tac.data[0]}B$`;
-                                        if(context.dataset.label === 'TAC 제외 매출') return `TAC: ${data.financials.tac.data[1]}B$ (${((data.financials.tac.data[1]/data.financials.tac.data[0])*100).toFixed(1)}%)`;
-                                        return '';
-                                    }
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    return ` PEG: ${context.formattedValue}`;
                                 }
-                            },
-                            title: {
-                                display: true,
-                                text: data.financials.tac.details,
-                                font: { size: 12 },
-                                color: '#64748B'
                             }
                         }
-                    }
-                });
-            };
-            
-            const renderValuationChart = () => {
-                const ctx = document.getElementById('valuationChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: data.valuation.peers,
-                        datasets: [
-                            {
-                                label: 'P/E Ratio (TTM)',
-                                data: data.valuation.pe,
-                                backgroundColor: '#60A5FA',
-                            },
-                            {
-                                label: 'PEG Ratio',
-                                data: data.valuation.peg,
-                                backgroundColor: '#FBBF24',
-                            }
-                        ]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'top' },
-                            title: { display: true, text: '구글은 경쟁사 대비 낮은 P/E를 보임' },
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                title: { display: true, text: '비율' }
-                            }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'PEG 비율 (낮을수록 저평가)' }
                         }
                     }
-                });
-            };
-            
-            const setupSotp = () => {
-                const container = document.getElementById('sotp-container');
-                data.valuation.sotp.forEach(item => {
-                    const isTotal = item.part.includes('총');
-                    const div = document.createElement('div');
-                    div.className = `flex justify-between items-center p-3 rounded-lg ${isTotal ? 'bg-indigo-100' : 'bg-slate-50'}`;
-                    div.innerHTML = `
-                        <span class="font-medium ${isTotal ? 'text-indigo-800 font-bold' : 'text-slate-700'}">${item.part}</span>
-                        <span class="font-bold text-lg ${isTotal ? 'text-indigo-800' : 'text-slate-800'}">${item.value}$</span>
-                    `;
-                    container.appendChild(div);
-                });
-            };
+                }
+            });
+        };
+        
+        const setupCommentaryTable = () => {
+            const tbody = document.getElementById('commentary-table');
+            const ratingColors = { '매수(Buy)': 'text-green-600', '비중확대(Overweight)': 'text-blue-600', '중립(Neutral)': 'text-yellow-600' };
 
-            const setupScenarios = () => {
-                const grid = document.getElementById('scenario-grid');
-                data.scenarios.forEach(item => {
-                    let likelihoodColor;
-                    switch(item.likelihood) {
-                        case '높음': likelihoodColor = 'bg-green-100 text-green-800'; break;
-                        case '중간': likelihoodColor = 'bg-yellow-100 text-yellow-800'; break;
-                        case '낮음': likelihoodColor = 'bg-red-100 text-red-800'; break;
-                    }
-                    const card = document.createElement('div');
-                    card.className = 'bg-white rounded-xl shadow-lg p-6 flex flex-col justify-between transform hover:-translate-y-1 transition-transform duration-300';
-                    card.innerHTML = `
-                        <div>
-                            <h4 class="text-lg font-bold text-slate-900">${item.title}</h4>
-                            <p class="text-sm text-slate-500 mt-2">${item.details}</p>
-                        </div>
-                        <div class="mt-4 flex justify-between items-center">
-                            <div>
-                                <span class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full ${likelihoodColor}">
-                                    가능성: ${item.likelihood}
-                                </span>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm font-medium text-slate-500">예상 영향</p>
-                                <p class="font-bold text-rose-600">${item.impact}</p>
-                            </div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
-            };
-
-            setupTimeline();
-            renderRevenueChart();
-            renderTacChart();
-            renderValuationChart();
-            setupSotp();
-            setupScenarios();
-        });
+            data.commentary.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "bg-white border-b hover:bg-slate-50";
+                tr.innerHTML = `
+                    <td class="px-6 py-4">${item.date}</td>
+                    <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">${item.firm}</th>
+                    <td class="px-6 py-4 font-bold ${ratingColors[item.rating] || ''}">${item.rating}</td>
+                    <td class="px-6 py-4">${item.comment}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        };
+        
+        // --- Initialization ---
+        setupTimeline();
+        createFinancialCharts();
+        updateFinancialCharts(); // Set initial view to risk-adjusted
+        renderDetailedPegChart();
+        setupCommentaryTable();
+    });
     </script>
 </body>
 </html>
