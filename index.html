@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>구글 독과점 리스크 심층 분석 대시보드 (반복손익 기준)</title>
+    <title>구글 독과점 리스크 심층 분석 대시보드 (최종 수정)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
@@ -11,11 +11,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Modern Slate (Background: #F1F5F9, Text: #1E293B, Primary Accent: #3B82F6, Highlight: #F59E0B) -->
-    <!-- Application Structure Plan: A single-page dashboard with a logical flow. This final version adds a new, detailed "Basis for Regulatory Risk Estimation" section as requested, providing quantitative reasoning for the risk factors applied in the financial charts. It explicitly excludes one-time costs as requested. -->
+    <!-- Application Structure Plan: This final version introduces a highly detailed 10-scenario valuation model and a new interactive "Custom Scenario Simulator" with sliders for AI growth and regulatory damage, plus year selection. -->
     <!-- Visualization & Content Choices: 
-    - Risk Estimation Basis: A new text-based section with clear headings and lists breaks down the logic for Search, Network, and Subscriptions risk factors, using specific numbers and assumptions, and explicitly stating one-time costs are excluded.
-    - P/E Analysis: Maintains the 1/2/3-Year Forward P/E split.
-    - Scenario Assumptions: The detailed 10-scenario grid remains.
+    - Custom Scenario Simulator: A new interactive section with two range sliders and year-selector buttons. A new Chart.js instance dynamically updates a bar chart showing the P/E of the custom scenario vs. peers. Animation is disabled. Calculated dollar values are displayed.
+    - Fixed Scenario Charts: The 4-chart grid (1Y, 2Y, 3Y P/E and PEG) is restored.
+    - Risk Estimation Basis: The detailed breakdown of recurring profit risk is maintained for clarity.
     - Overall Assessment: The conclusion integrates all preceding quantitative analysis.
     - Libraries: Chart.js for all charts (Canvas). Vanilla JS for all interactions. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
@@ -43,7 +43,7 @@
         <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex-shrink-0">
-                    <h1 class="text-xl font-bold text-slate-800">Google 독점 규제 심층 분석</h1>
+                    <h1 class="text-xl font-bold text-slate-800">Google 독점 규제 심층 분석 v22</h1>
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-2">
@@ -102,34 +102,24 @@
             </div>
             
             <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mt-8">
-                 <h3 class="text-2xl font-bold text-slate-900 mb-4">규제 리스크 영향분 산정 근거 (반복 손익 기준)</h3>
+                 <h3 class="text-2xl font-bold text-slate-900 mb-4">재무 차트 '리스크 영향분' 산정 근거</h3>
                  <p class="text-sm text-slate-500 mb-6">아래 분석은 차트에 표시된 '리스크 영향분'의 산출 근거를 설명합니다. 이 계산에서는 반복적으로 이익에 영향을 미칠 수 있는 요인에 집중했으며, **일회성 비용(예: 벌금, 소송 합의금)은 제외**했습니다.</p>
                  <div class="space-y-6 text-sm">
                     <div class="prose prose-slate max-w-none">
-                        <h4>1. 핵심 규제 사안별 이익 영향 추정</h4>
+                        <h4>1. 핵심 규제 사안별 반복적 이익 감소 추정</h4>
                         <ul>
-                            <li><strong>Apple TAC 계약 파기 시나리오 분석 (반복적 손익):</strong>
-                                <ul>
-                                    <li>(+) 이익 증가 요인: 연간 TAC 비용 <strong class="text-green-600">약 200억 달러</strong> 절감.</li>
-                                    <li>(-) 이익 감소 요인: iOS 트래픽 감소로 인한 검색 광고 이익 손실을 약 <strong class="text-red-600">125억 달러</strong>로 추정 (매출 손실 278억 달러 * 검색 이익률 45%).</li>
-                                    <li>단기적 순 영향: +200억 - 125억 = <strong class="text-green-600">약 +75억 달러</strong> 이익 증가. <br><em>(주: 이는 시장 점유율 하락과 장기 성장 둔화라는 질적 리스크를 고려하지 않은 단기적, 회계적 수치입니다.)</em></li>
-                                </ul>
-                            </li>
-                             <li><strong>광고 기술(Ad-Tech) 규제 시 이익 영향:</strong>
-                                 <ul>
-                                    <li>Google Ad Manager 등 사업부의 기능 제한 또는 분할 리스크를 고려하여, 네트워크 부문 영업이익(연간 약 64억 달러)의 30%인 약 <strong class="text-red-600">-19억 달러</strong>의 반복적 이익 감소를 가정합니다.</li>
-                                 </ul>
-                            </li>
-                             <li><strong>구독(Play Store) 규제 시 이익 영향:</strong>
-                                 <ul>
-                                    <li>대체 결제 시스템 도입에 따른 평균 수수료율 하락을 가정하여, 구독 부문 영업이익(연간 약 70억 달러)의 15%인 약 <strong class="text-red-600">-10억 달러</strong>의 반복적 이익 감소를 가정합니다.</li>
-                                 </ul>
-                            </li>
+                            <li><strong>광고 기술(Ad-Tech) 규제:</strong> 네트워크(Network) 사업부의 기능 제한 및 분할 리스크를 반영, 해당 사업부 연간 영업이익(약 64억 달러)의 30%인 <strong class="text-red-600">약 -19억 달러</strong>의 이익 감소를 가정합니다.</li>
+                            <li><strong>구독(Play Store) 규제:</strong> 대체 결제 시스템 도입에 따른 수수료율 하락을 반영, 구독/플랫폼(Subscriptions) 사업부 연간 영업이익(약 70억 달러)의 15%인 <strong class="text-red-600">약 -10억 달러</strong>의 이익 감소를 가정합니다.</li>
+                            <li><strong>검색(Search) 간접 영향:</strong> 위 두 규제가 검색 생태계에 미치는 간접적 영향(데이터 접근성 약화 등)을 고려하여 검색 사업부 연간 영업이익(약 690억 달러)의 2% 수준인 <strong class="text-red-600">약 -14억 달러</strong>의 이익 감소를 가정합니다.</li>
                         </ul>
                     </div>
                     <div class="prose prose-slate max-w-none">
                         <h4>2. 차트 '리스크 영향분' 산정 최종 결론</h4>
-                        <p>본 차트에 표시된 '리스크 영향분'은 개별 규제가 현실화되었을 때 발생할 수 있는 **부정적 이익 감소** 측면을 시각화하기 위한 것입니다. 따라서 가장 가능성이 높은 리스크인 Ad-Tech 규제(-19억 달러)와 Play Store 규제(-10억 달러)의 영향을 종합하여, 이를 각 사업부의 특성에 맞게 리스크 비율로 분배하여 적용했습니다. Apple TAC 시나리오의 복합적 영향(단기 이익 증가, 장기 성장 둔화)은 별도로 고려되어야 합니다.</p>
+                        <ul>
+                            <li>산정된 총 반복적 이익 리스크는 -19억 - 10억 - 14억 = <strong class="text-red-600">약 -43억 달러</strong>입니다.</li>
+                             <li>차트의 '리스크 영향분'은 이 총 리스크를 각 사업부의 이익 규모와 리스크 노출도에 비례하여 분배하여 시각화한 것입니다. 이는 각 부문이 직면한 리스크의 절대적 크기를 나타냅니다.</li>
+                        </ul>
+                        <p class="mt-4 text-xs text-slate-400">참고: Apple TAC 계약 파기 시나리오는 단기적 회계상 이익(+75억 달러)과 장기적 성장 둔화라는 복합적 효과가 있어, 위 '리스크 영향분' 계산에서는 제외하고 '시나리오 평가' 섹션에서 별도로 다룹니다.</p>
                     </div>
                  </div>
             </div>
@@ -137,23 +127,56 @@
         
         <section id="valuation" class="scroll-mt-20 mb-20">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-900">10대 시나리오 기반 정량 분석 (Forward P/E & PEG)</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-4xl mx-auto">규제와 AI 변수를 조합한 10가지 구체적인 시나리오별로 구글의 1~3년 후 예상 P/E와 PEG를 계산하고, 경쟁사와 비교 분석합니다. (현재 주가: $174 기준)</p>
+                <h2 class="text-3xl font-bold text-slate-900">시나리오 기반 정량 분석</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-4xl mx-auto">규제와 AI 변수를 조합하여 구글의 가치를 다각도로 분석합니다. (현재 주가: $174 기준)</p>
+            </div>
+            
+             <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mt-8">
+                <h3 class="text-2xl font-bold text-slate-900 mb-6">커스텀 시나리오 시뮬레이터</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-4">
+                    <div>
+                        <label for="aiGrowthSlider" class="block text-sm font-medium text-slate-700">AI 성장률 (<span id="aiGrowthValuePercent">100</span>%)</label>
+                        <input id="aiGrowthSlider" type="range" min="0" max="150" value="100" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        <p class="text-xs text-slate-500 mt-1">예상 AI 이익 기여도($9.2B) 대비 달성률</p>
+                    </div>
+                    <div>
+                        <label for="damageRateSlider" class="block text-sm font-medium text-slate-700">규제 피해액률 (<span id="damageRateValuePercent">10</span>%)</label>
+                        <input id="damageRateSlider" type="range" min="0" max="20" value="10" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                        <p class="text-xs text-slate-500 mt-1">총 광고 매출 대비 반복적 손실 비율</p>
+                    </div>
+                </div>
+                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8 p-4 bg-slate-50 rounded-lg">
+                     <div><span class="text-sm font-medium text-slate-600">AI 이익 기여:</span> <span id="aiGrowthValueAmount" class="font-bold text-green-600"></span></div>
+                     <div><span class="text-sm font-medium text-slate-600">규제 이익 손실:</span> <span id="damageRateValueAmount" class="font-bold text-red-600"></span></div>
+                     <div><span class="text-sm font-medium text-slate-600">최종 순이익 영향:</span> <span id="totalImpactValueAmount" class="font-bold"></span></div>
+                 </div>
+
+                 <div class="flex justify-between items-center mb-4">
+                    <h4 class="text-xl font-bold text-slate-800">예상 P/E 비교 (커스텀 시나리오)</h4>
+                    <div id="custom-per-year-selector" class="flex space-x-1 bg-slate-200 p-1 rounded-lg">
+                        <button data-year="1" class="px-3 py-1 text-sm rounded-md bg-white shadow">1년 후</button>
+                        <button data-year="2" class="px-3 py-1 text-sm rounded-md">2년 후</button>
+                        <button data-year="3" class="px-3 py-1 text-sm rounded-md">3년 후</button>
+                    </div>
+                </div>
+                <div class="chart-container h-[450px]">
+                    <canvas id="customPerChart"></canvas>
+                </div>
             </div>
 
-             <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl">
-                <h3 class="text-xl font-bold text-slate-800 mb-4">10대 시나리오 상세 가정 및 결과</h3>
+             <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-xl mt-8">
+                <h3 class="text-2xl font-bold text-slate-900 mb-4">10대 고정 시나리오 분석</h3>
                 <div id="scenario-details" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-12">
                 </div>
                 
-                <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                    <div>
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-12">
+                     <div>
                         <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">1년 후 예상 P/E 비율 비교</h3>
                          <div class="chart-container h-[450px]">
                             <canvas id="perChart1Y"></canvas>
                         </div>
                     </div>
-                    <div>
+                     <div>
                         <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">2년 후 예상 P/E 비율 비교</h3>
                          <div class="chart-container h-[450px]">
                             <canvas id="perChart2Y"></canvas>
@@ -178,7 +201,7 @@
         <section id="commentary" class="scroll-mt-20 mb-20">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-slate-900">월가 코멘트 및 분석</h2>
-                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">규제 이슈에 대한 주요 투자은행들의 최신 분석 리포트를 정리했습니다.</p>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">규제 이슈에 대한 주요 투자은행 및 언론 분석을 정리했습니다.</p>
             </div>
             <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
                 <div class="overflow-x-auto">
@@ -186,9 +209,11 @@
                         <thead class="text-xs text-slate-700 uppercase bg-slate-100">
                             <tr>
                                 <th scope="col" class="px-6 py-3">날짜</th>
-                                <th scope="col" class="px-6 py-3">기관</th>
-                                <th scope="col" class="px-6 py-3">평가</th>
-                                <th scope="col" class="px-6 py-3">주요 코멘트</th>
+                                <th scope="col" class="px-6 py-3">IB/출처</th>
+                                <th scope="col" class="px-6 py-3">분석가</th>
+                                <th scope="col" class="px-6 py-3">매수 등급</th>
+                                <th scope="col" class="px-6 py-3">목표가(USD)</th>
+                                <th scope="col" class="px-6 py-3">주요 전망</th>
                             </tr>
                         </thead>
                         <tbody id="commentary-table">
@@ -238,7 +263,7 @@
                 labels: ['검색', '클라우드', '유튜브 광고', '구독/기기', '네트워크'],
                 revenue: [461.56, 95.74, 80.90, 87.39, 74.13],
                 profit: [210.7, 9.0, 32.5, 27.7, 28.5],
-                riskFactors: [0.30, 0.05, 0.15, 0.20, 0.40] 
+                riskFactors: [0.02, 0, 0, 0.15, 0.30] 
             },
             timeline: [
                 { date: '2020-10-20', title: '미 법무부(DOJ), 검색 독점 소송 제기', icon: '⚖️', details: '온라인 검색 및 검색 광고 시장의 불법적 독점을 혐의로 제소. 특히 애플 등과의 배타적 기본 검색 엔진 계약이 핵심 쟁점으로 부상.'},
@@ -252,8 +277,8 @@
             ],
             valuation: {
                 scenariosData: [
-                    { name: '1.최악', assumptions: 'TAC파기(-$7.8B)+AdTech분할(-$2.2B)', ai_growth: 'AI 수익화 실패 (기여도 $0)', fwd_pe_1y: 22.2, fwd_pe_2y: 20.6, fwd_pe_3y: 19.1, peg: 3.01, color: '#7f1d1d' },
-                    { name: '2.비관', assumptions: 'TAC 파기 (-$7.8B)', ai_growth: 'AI 수익화 실패 (기여도 $0)', fwd_pe_1y: 20.8, fwd_pe_2y: 18.9, fwd_pe_3y: 17.4, peg: 2.31, color: '#b91c1c' },
+                    { name: '1.최악', assumptions: 'TAC파기(-$7.8B)+AdTech분할(-$2.2B)', ai_growth: 'AI 수익화 실패 ($0)', fwd_pe_1y: 22.2, fwd_pe_2y: 20.6, fwd_pe_3y: 19.1, peg: 3.01, color: '#7f1d1d' },
+                    { name: '2.비관', assumptions: 'TAC 파기 (-$7.8B)', ai_growth: 'AI 수익화 실패 ($0)', fwd_pe_1y: 20.8, fwd_pe_2y: 18.9, fwd_pe_3y: 17.4, peg: 2.31, color: '#b91c1c' },
                     { name: '3.침체', assumptions: 'TAC 파기 (-$7.8B)', ai_growth: 'Cloud AI 성공 (+$2.0B)', fwd_pe_1y: 19.8, fwd_pe_2y: 17.8, fwd_pe_3y: 16.1, peg: 1.88, color: '#dc2626' },
                     { name: '4.약한회복', assumptions: 'TAC 파기 (-$7.8B)', ai_growth: 'Workspace AI 성공 (+$7.2B)', fwd_pe_1y: 18.6, fwd_pe_2y: 16.6, fwd_pe_3y: 14.8, peg: 1.56, color: '#f97316' },
                     { name: '5.중립', assumptions: '행태규제 (-$3B)', ai_growth: 'Workspace AI 성공 (+$7.2B)', fwd_pe_1y: 17.4, fwd_pe_2y: 15.5, fwd_pe_3y: 13.8, peg: 1.34, color: '#f59e0b' },
@@ -271,10 +296,16 @@
                 ]
             },
             commentary: [
-                { date: '2025-04-21', firm: 'Goldman Sachs', rating: '중립(Neutral)', comment: '광고 기술 소송 패소로 불확실성 증대. 사업부 매각 시나리오가 현실화될 경우 단기적 주가 충격 불가피. 클라우드 성장이 관건.' },
-                { date: '2025-04-19', firm: 'Morgan Stanley', rating: '비중확대(Overweight)', comment: '광고 부문 리스크는 주가에 상당 부분 선반영. AI를 통한 검색 경험 혁신과 클라우드 사업의 견조한 이익 성장이 장기적 상승 동력으로 작용할 것.' },
-                { date: '2025-01-15', firm: 'J.P. Morgan', rating: '비중확대(Overweight)', comment: '규제 리스크에도 불구하고 펀더멘털은 견고. 2025년 AI 관련 신규 수익 창출 기대. 저평가 매력 부각.' },
-                { date: '2024-08-06', firm: 'BofA Securities', rating: '매수(Buy)', comment: '검색 소송 패소는 예상된 결과. 최악의 시나리오(크롬 매각) 가능성은 낮다고 판단. 행태적 시정 조치 수준에서 마무리될 가능성에 무게.' },
+                { date: '2024-10-30', firm: 'Tech42', analyst: '순다르 피차이 인용', rating: '-', target_price: '-', comment: 'AI로 생성된 코드 25% 이상, 구글 서비스 매출 765억 달러(13% 증가).' },
+                { date: '2025-02-05', firm: 'Investing.com', analyst: '-', rating: '-', target_price: '-', comment: '최신 실적 강력, 검색 매출 13.87% 성장, P/E 18.82 매력적.' },
+                { date: '2025-03-07', firm: 'Investing.com', analyst: '-', rating: '-', target_price: '-', comment: '반독점 소송 지속, AI 및 클라우드 성장 잠재력 강조.' },
+                { date: '2025-03-27', firm: 'Tikr.com', analyst: '-', rating: '매수', target_price: '261', comment: '2년 후 주당 261달러, 37% 상승 여력, EPS 연평균 11.1% 성장 예상.' },
+                { date: '2025-04-21', firm: 'Scotiabank', analyst: 'Nat Schindler', rating: '섹터 아웃퍼폼', target_price: '200', comment: 'GCP 지출 둔화, 반독점 조사 강화, 검색 대체 우려 과장, 관세 회복력 강함.' },
+                { date: '2025-04-22', firm: 'Mitrade', analyst: '-', rating: '매수', target_price: '180~210', comment: 'AI(Gemini 2.0), 클라우드, 웨이모 성장, 800억 달러 FCF로 안정성 유지.' },
+                { date: '2025-05-09', firm: '매일경제', analyst: '-', rating: '-', target_price: '-', comment: '애플 계약 종료 우려, 주가 7% 급락, AI 검색 대체 가능성 리스크.' },
+                { date: '2025-05-12', firm: '중앙일보', analyst: '-', rating: '매수', target_price: '-', comment: 'AI 오버뷰(AIO)로 검색 효율성↑, 관세 영향 없음, 저점 매수 기회.' },
+                { date: '2025-05-22', firm: '한국경제', analyst: '-', rating: '매수', target_price: '-', comment: 'AI 오버뷰로 검색 시장 회복, 투자자 저점 매수, AI 구독 서비스 긍정적.' },
+                { date: '2025-06-01', firm: 'Investing.com', analyst: '52명 애널리스트', rating: '적극 매수', target_price: '201.47', comment: '평균 목표가 201.47달러, 15.35% 상승 여력, EPS 성장 지속.' },
             ]
         };
 
@@ -358,30 +389,120 @@
         };
 
         const renderValuationCharts = () => {
-            const chartData = [...data.valuation.peers, ...data.valuation.scenariosData];
-            const labels = chartData.map(d => d.name);
+            let customPerChart;
+            const aiGrowthSlider = document.getElementById('aiGrowthSlider');
+            const damageRateSlider = document.getElementById('damageRateSlider');
+            const aiGrowthValuePercentSpan = document.getElementById('aiGrowthValuePercent');
+            const damageRateValuePercentSpan = document.getElementById('damageRateValuePercent');
+            const aiGrowthValueAmountSpan = document.getElementById('aiGrowthValueAmount');
+            const damageRateValueAmountSpan = document.getElementById('damageRateValueAmount');
+            const totalImpactValueAmountSpan = document.getElementById('totalImpactValueAmount');
+            const customYearSelector = document.getElementById('custom-per-year-selector');
 
-            const createBarChart = (canvasId, datasetLabel, dataKey, yAxisLabel) => {
-                const ctx = document.getElementById(canvasId).getContext('2d');
-                new Chart(ctx, {
+            const baseline = {
+                eps: 7.84,
+                growth: 0.18,
+                adRevenue: 282.8, 
+                adMargin: 0.35,
+                shares: 12.5, 
+                maxAiProfit: 9.2 
+            };
+            
+            const updateCustomChart = () => {
+                const aiGrowthPercent = parseInt(aiGrowthSlider.value);
+                const damageRatePercent = parseInt(damageRateSlider.value);
+                const selectedYear = parseInt(customYearSelector.querySelector('.bg-white').dataset.year);
+
+                aiGrowthValuePercentSpan.textContent = aiGrowthPercent;
+                damageRateValuePercentSpan.textContent = damageRatePercent;
+                
+                const damageProfitLoss = baseline.adRevenue * (damageRatePercent / 100) * baseline.adMargin;
+                const aiProfitGain = baseline.maxAiProfit * (aiGrowthPercent / 100);
+                const totalProfitChange = aiProfitGain - damageProfitLoss;
+
+                aiGrowthValueAmountSpan.textContent = `+$${aiProfitGain.toFixed(2)}B`;
+                damageRateValueAmountSpan.textContent = `-$${damageProfitLoss.toFixed(2)}B`;
+                totalImpactValueAmountSpan.textContent = `${totalProfitChange >= 0 ? '+' : ''}$${totalProfitChange.toFixed(2)}B`;
+                totalImpactValueAmountSpan.className = `font-bold ${totalProfitChange >= 0 ? 'text-green-600' : 'text-red-600'}`;
+
+
+                const epsChange = totalProfitChange / baseline.shares;
+                const newEps = baseline.eps + epsChange;
+
+                const newGrowth = baseline.growth + (aiGrowthPercent / 100 * 0.12) - (damageRatePercent / 100 * 0.15);
+
+                let fwdEps = newEps;
+                for(let i=0; i<selectedYear; i++){
+                    fwdEps *= (1 + newGrowth);
+                }
+                const customFwdPE = 174 / fwdEps;
+
+                const customChartData = [
+                    ...data.valuation.peers, 
+                    {
+                        name: '커스텀 시나리오',
+                        fwd_pe_1y: selectedYear === 1 ? customFwdPE : data.valuation.peers.find(p=>p.name === '커스텀 시나리오')?.fwd_pe_1y,
+                        fwd_pe_2y: selectedYear === 2 ? customFwdPE : data.valuation.peers.find(p=>p.name === '커스텀 시나리오')?.fwd_pe_2y,
+                        fwd_pe_3y: selectedYear === 3 ? customFwdPE : data.valuation.peers.find(p=>p.name === '커스텀 시나리오')?.fwd_pe_3y,
+                        color: '#6366F1'
+                    }
+                ];
+                
+                const dataKey = `fwd_pe_${selectedYear}y`;
+                const yAxisLabel = `${selectedYear}년 후 예상 P/E 비율`;
+                
+                if (customPerChart) {
+                    customPerChart.destroy();
+                }
+                
+                const customPerCtx = document.getElementById('customPerChart').getContext('2d');
+                customPerChart = new Chart(customPerCtx, {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels: customChartData.map(d => d.name),
                         datasets: [{
-                            label: datasetLabel,
-                            data: chartData.map(d => d[dataKey]),
-                            backgroundColor: chartData.map(d => d.color),
+                            label: yAxisLabel,
+                            data: customChartData.map(d => d[dataKey]),
+                            backgroundColor: customChartData.map(d => d.color),
                         }]
                     },
                     options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
+                        responsive: true, maintainAspectRatio: false,
+                        animation: { duration: 0 },
                         plugins: { legend: { display: false } },
                         scales: { y: { title: { display: true, text: yAxisLabel } } }
                     }
                 });
             };
 
+            aiGrowthSlider.addEventListener('input', updateCustomChart);
+            damageRateSlider.addEventListener('input', updateCustomChart);
+            customYearSelector.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    Array.from(customYearSelector.children).forEach(btn => btn.classList.remove('bg-white', 'shadow'));
+                    e.target.classList.add('bg-white', 'shadow');
+                    updateCustomChart();
+                }
+            });
+
+            updateCustomChart();
+
+
+            // Fixed scenario charts
+            const createBarChart = (canvasId, datasetLabel, dataKey, yAxisLabel) => {
+                const chartData = [...data.valuation.peers, ...data.valuation.scenariosData];
+                const labels = chartData.map(d => d.name);
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{ label: datasetLabel, data: chartData.map(d => d[dataKey]), backgroundColor: chartData.map(d => d.color) }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { title: { display: true, text: yAxisLabel } } } }
+                });
+            };
+            
             createBarChart('perChart1Y', '1년 후 예상 P/E', 'fwd_pe_1y', '1년 후 예상 P/E 비율');
             createBarChart('perChart2Y', '2년 후 예상 P/E', 'fwd_pe_2y', '2년 후 예상 P/E 비율');
             createBarChart('perChart3Y', '3년 후 예상 P/E', 'fwd_pe_3y', '3년 후 예상 P/E 비율');
@@ -411,7 +532,7 @@
         
         const setupCommentaryTable = () => {
             const tbody = document.getElementById('commentary-table');
-            const ratingColors = { '매수(Buy)': 'text-green-600', '비중확대(Overweight)': 'text-blue-600', '중립(Neutral)': 'text-yellow-600' };
+            const ratingColors = { '매수': 'text-green-600', '적극 매수': 'text-green-700 font-bold', '섹터 아웃퍼폼': 'text-blue-600' };
 
             data.commentary.forEach(item => {
                 const tr = document.createElement('tr');
@@ -419,8 +540,10 @@
                 tr.innerHTML = `
                     <td class="px-6 py-4">${item.date}</td>
                     <th scope="row" class="px-6 py-4 font-medium text-slate-900 whitespace-nowrap">${item.firm}</th>
-                    <td class="px-6 py-4 font-bold ${ratingColors[item.rating] || ''}">${item.rating}</td>
-                    <td class="px-6 py-4">${item.comment}</td>
+                    <td class="px-6 py-4">${item.analyst || '-'}</td>
+                    <td class="px-6 py-4 font-bold ${ratingColors[item.rating] || ''}">${item.rating || '-'}</td>
+                    <td class="px-6 py-4">${item.target_price || '-'}</td>
+                    <td class="px-6 py-4 text-xs">${item.comment}</td>
                 `;
                 tbody.appendChild(tr);
             });
